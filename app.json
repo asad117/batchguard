@@ -4,10 +4,20 @@
     "slug": "batchguard",
     "version": "1.0.0",
     "icon": "./assets/icon.png",
+    "owner": "asad117",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#111827"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/774fd4d5-6fdf-4b33-9aa1-70e60ac12a1f",
+      "enabled": true,
+      "checkOnLaunch": "ALWAYS",
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
     "plugins": [
       [
@@ -24,16 +34,15 @@
         "backgroundColor": "#111827"
       },
       "permissions": [
-        "android.permission.CAMERA",
         "android.permission.CAMERA"
       ],
-      "package": "com.anonymous.batchguard"
+      "package": "com.asadhashmi.batchguard"
     },
     "ios": {
       "bundleIdentifier": "com.asadhashmi.batchguard",
       "supportsTablet": true,
       "entitlements": {
-        "aps-environment": {}
+        "aps-environment": null
       },
       "infoPlist": {
         "NSCameraUsageDescription": "BatchGuard needs access to your camera to scan barcodes and expiry dates.",
@@ -44,13 +53,6 @@
       "eas": {
         "projectId": "774fd4d5-6fdf-4b33-9aa1-70e60ac12a1f"
       }
-    },
-    "owner": "asad117",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/774fd4d5-6fdf-4b33-9aa1-70e60ac12a1f"
     }
   }
 }
