@@ -29,7 +29,9 @@ export default function SettingsScreen() {
             ? Haptics.ImpactFeedbackStyle.Light
             : Haptics.ImpactFeedbackStyle.Medium
         );
-      } catch 
+      } catch (error) {
+        console.error("Haptics error", error);
+      }
     },
     []
   );

@@ -24,6 +24,7 @@
         "backgroundColor": "#111827"
       },
       "permissions": [
+        "android.permission.CAMERA",
         "android.permission.CAMERA"
       ],
       "package": "com.anonymous.batchguard"
@@ -44,6 +45,12 @@
         "projectId": "774fd4d5-6fdf-4b33-9aa1-70e60ac12a1f"
       }
     },
-    "owner": "asad117"
+    "owner": "asad117",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/774fd4d5-6fdf-4b33-9aa1-70e60ac12a1f"
+    }
   }
 }
