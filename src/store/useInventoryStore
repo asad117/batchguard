@@ -1,0 +1,28 @@
+import { create } from 'zustand';
+import { Batch, Product } from '../types/inventory';
+
+interface InventoryState {
+  products: Record<string, Product>;
+  batches: Batch[];
+  addProductAndBatch: (product: Product, batch: Omit<Batch, 'id' | 'entryDate' | 'status'>) => void;
+}
+
+export const useInventoryStore = create<InventoryState>((set) => ({
+  products: {},
+  batches: [],
+
+  addProductAndBatch: (product, batchData) =>
+    set((state) => {
+      const newBatch: Batch = {
+        ...batchData,
+        id: Math.random().toString(36).substring(7), // In prod, use a UUID library
+        entryDate: new Date().toISOString(),
+        status: 'active',
+      };
+
+      return {
+        products: { ...state.products, [product.id]: product },
+        batches: [newBatch, ...state.batches],
+      };
+    }),
+}));
