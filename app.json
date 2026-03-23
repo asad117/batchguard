@@ -2,7 +2,7 @@
   "expo": {
     "name": "BatchGuard",
     "slug": "batchguard",
-    "scheme": "batchguard", 
+    "scheme": "batchguard",
     "version": "1.0.0",
     "icon": "./assets/icon.png",
     "owner": "asad117",
@@ -27,7 +27,10 @@
           "cameraPermissionText": "BatchGuard needs access to your camera to scan barcodes and expiry dates."
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "@react-native-community/datetimepicker",
+      "expo-router",
+      "expo-web-browser"
     ],
     "android": {
       "adaptiveIcon": {

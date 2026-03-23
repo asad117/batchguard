@@ -1,6 +1,10 @@
+// src/components/inventory/BatchDetailModal.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as Print from 'expo-print';
+import { getCommercialStatus } from '../../utils/commercialLogic';
+import { useInventoryStore } from '../../store/useInventoryStore';
 
 interface Props {
   batch: any;
@@ -9,6 +13,31 @@ interface Props {
 }
 
 export default function BatchDetailModal({ batch, product, onClose }: Props) {
+
+  const preferences = useInventoryStore((state) => state.preferences);
+  const status = getCommercialStatus(batch?.expiryDate, preferences.daysBeforeExpiry);
+
+
+  const handlePrint = async () => {
+    const html = `
+      <html>
+        <body style="font-family: sans-serif; text-align: center; padding: 20px;">
+          <h1 style="font-size: 50px; margin: 0;">${status.discount}% OFF</h1>
+          <h2 style="margin: 10px 0;">${product?.name}</h2>
+          <p style="font-size: 20px;">Exp: ${batch.expiryDate}</p>
+          <div style="margin-top: 20px; font-weight: bold; border: 2px solid black; padding: 10px;">
+            BARCODE: ${batch.barcode}
+          </div>
+        </body>
+      </html>
+    `;
+    
+    // Prints one label for every unit in stock
+    for (let i = 0; i < batch.quantity; i++) {
+      await Print.printAsync({ html });
+    }
+  };
+
   if (!batch) return null;
 
   return (
@@ -57,6 +86,13 @@ export default function BatchDetailModal({ batch, product, onClose }: Props) {
               </View>
             </View>
 
+                  {status.discount > 0 && (
+              <TouchableOpacity style={styles.printBtn} onPress={handlePrint}>
+                <Ionicons name="print-outline" size={20} color="white" />
+                <Text style={styles.printText}>Print ${batch.quantity} Labels</Text>
+              </TouchableOpacity>
+            )}
+
             {/* ACTION BUTTONS */}
             <View style={styles.actionGrid}>
               <TouchableOpacity style={styles.duplicateBtn}>
@@ -99,5 +135,22 @@ const styles = StyleSheet.create({
   duplicateBtn: { flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWith: 1, borderColor: '#3B82F6', borderWidth: 1, padding: 18, borderRadius: 20 },
   duplicateText: { color: '#3B82F6', fontWeight: '800', fontSize: 15 },
   deleteBtn: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FEE2E2', padding: 18, borderRadius: 20 },
-  deleteText: { color: '#EF4444', fontWeight: '800', fontSize: 14 }
+  deleteText: { color: '#EF4444', fontWeight: '800', fontSize: 14 },
+
+   printBtn: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    gap: 8, 
+    backgroundColor: '#10B981', 
+    padding: 18, 
+    borderRadius: 20,
+    marginBottom: 10 
+  },
+  printText: { color: 'white', fontWeight: '800', fontSize: 15 },
+  actionGrid: { 
+  flexDirection: 'column', 
+  gap: 10, 
+  marginTop: 10 
+},
 });

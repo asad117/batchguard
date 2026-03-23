@@ -1,43 +1,85 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+// src/components/ScannerOverlay.tsx
+import React, { useState } from 'react';
+import { Modal, StyleSheet, TouchableOpacity, View, Text } from 'react-native';
+import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import { Ionicons } from '@expo/vector-icons';
 
-export const ScannerOverlay = ({ barcodeFound, dateFound }: { barcodeFound: boolean, dateFound: boolean }) => {
+interface Props {
+  isVisible: boolean;
+  onClose: () => void;
+  onScan: (barcode: string) => void;
+}
+
+export const ScannerOverlay = ({ isVisible, onClose, onScan }: Props) => {
+  const device = useCameraDevice('back');
+  const [isLocked, setIsLocked] = useState(false);
+
+  const codeScanner = useCodeScanner({
+    codeTypes: ['code-128', 'ean-13', 'upc-a'],
+    onCodeScanned: (codes) => {
+      if (codes.length > 0 && codes[0].value && !isLocked) {
+        setIsLocked(true); // Prevent multiple rapid scans
+        onScan(codes[0].value);
+        
+        // Reset lock after a delay if modal doesn't close
+        setTimeout(() => setIsLocked(false), 2000);
+      }
+    }
+  });
+
+  if (!device) return null;
+
   return (
-    <View style={StyleSheet.absoluteFill}>
-      {/* Top Zone: Barcode */}
-      <View style={[styles.targetZone, barcodeFound && styles.foundZone]}>
-        <Text style={styles.label}>{barcodeFound ? '✅ Barcode Locked' : 'Align Barcode'}</Text>
-      </View>
+    <Modal visible={isVisible} animationType="slide">
+      <View style={styles.container}>
+        <Camera
+          style={StyleSheet.absoluteFill}
+          device={device}
+          isActive={isVisible}
+          codeScanner={codeScanner}
+        />
+        
+        {/* YOUR VISUAL FEEDBACK LAYER */}
+        <View style={styles.overlay}>
+          <View style={[styles.targetZone, isLocked && styles.foundZone]}>
+             <Ionicons 
+                name={isLocked ? "checkmark-circle" : "scan-outline"} 
+                size={40} 
+                color="white" 
+             />
+             <Text style={styles.label}>
+                {isLocked ? '✅ Barcode Locked' : 'Align Barcode'}
+             </Text>
+          </View>
+        </View>
 
-      {/* Bottom Zone: Expiry Date */}
-      <View style={[styles.targetZone, dateFound && styles.foundZone]}>
-        <Text style={styles.label}>{dateFound ? '✅ Expiry Detected' : 'Scan Expiry Date'}</Text>
+        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <Ionicons name="close-circle" size={50} color="white" />
+        </TouchableOpacity>
       </View>
-    </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: 'black' },
+  overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
   targetZone: {
-    flex: 1,
-    margin: 40,
+    width: 280,
+    height: 180,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
-    borderRadius: 12,
+    borderRadius: 20,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.2)'
   },
   foundZone: {
     borderColor: '#4ADE80',
-    backgroundColor: 'rgba(74, 222, 128, 0.1)',
+    backgroundColor: 'rgba(74, 222, 128, 0.2)',
     borderStyle: 'solid',
   },
-  label: {
-    color: 'white',
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 10,
-    borderRadius: 4,
-  }
+  label: { color: 'white', fontWeight: '800', marginTop: 10, textTransform: 'uppercase' },
+  closeBtn: { position: 'absolute', bottom: 50, alignSelf: 'center' }
 });

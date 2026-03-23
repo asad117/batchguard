@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { LayoutDashboard, ScanLine } from 'lucide-react-native';
 import React from 'react';
+import { ErrorBoundary } from 'expo-router';
 
 export default function TabLayout() {
   return (
@@ -22,3 +23,6 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+export {
+  ErrorBoundary,
+} from 'expo-router';

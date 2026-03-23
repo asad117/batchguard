@@ -84,7 +84,7 @@ export default function ScannerScreen() {
         isVisible={modalVisible}
         productName={productInfo?.name || ""}
         brand={productInfo?.brand || ""} 
-        category={productInfo?.category || "Other"} // Pass existing category if known
+        category={productInfo?.category || "Other"} 
         detectedExpiry={detectedExpiry}
         // Updated to accept all 5 arguments from the Modal
         onConfirm={(qty, date, name, brand, category) => {

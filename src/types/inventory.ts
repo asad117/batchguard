@@ -3,6 +3,10 @@
  * Core data models for Product and Batch management.
  */
 
+export type FilterType = 'all' | 'critical' | 'warning' | 'expired';
+
+export type SortOption = 'expiry_asc' | 'expiry_desc' | 'qty_desc' | 'name_asc';
+
 export interface Product {
   id: string;          // The Barcode/GTIN
   name: string;

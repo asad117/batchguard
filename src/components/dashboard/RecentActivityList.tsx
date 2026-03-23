@@ -2,17 +2,17 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function RecentActivityList({ batches, products }: any) {
+export default function RecentActivityList({ batches, products,onSelect }: any) {
   const recent = batches.slice(0, 5);
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <Text style={styles.title}>Recent Scans</Text>
         <TouchableOpacity onPress={() => router.push('/inventory-list')}>
           <Text style={styles.actionText}>View All</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {recent.length === 0 ? (
         <Text style={styles.empty}>No recent activity.</Text>
@@ -20,6 +20,8 @@ export default function RecentActivityList({ batches, products }: any) {
         recent.map((batch: any) => {
           const product = products[batch.barcode];
           return (
+        <TouchableOpacity onPress={() => onSelect(batch)}>
+
             <View key={batch.id} style={styles.item}>
               <View style={styles.imgContainer}>
                 {product?.imageUrl ? (
@@ -36,6 +38,7 @@ export default function RecentActivityList({ batches, products }: any) {
                 <Text style={styles.qtyText}>x{batch.quantity}</Text>
               </View>
             </View>
+            </TouchableOpacity>
           );
         })
       )}
@@ -44,7 +47,7 @@ export default function RecentActivityList({ batches, products }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { marginTop: 30 },
+  container: { marginTop: 10 ,padding:20},
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 20, fontWeight: '800', color: '#111827' },
   actionText: { fontSize: 14, fontWeight: '700', color: '#3B82F6' },

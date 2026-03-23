@@ -1,7 +1,9 @@
-// src/components/inventory/InventoryItem.tsx
 import { Ionicons } from '@expo/vector-icons';
-import React, { memo } from 'react'; // Added memo
+import React, { memo } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useInventoryStore } from '../../store/useInventoryStore';
+import { getCommercialStatus } from '../../utils/commercialLogic';
+import { StatusBadge } from '../common/StatusBadge';
 
 interface Props {
   item: any;
@@ -12,16 +14,14 @@ interface Props {
   onLongPress: () => void;
 }
 
-// Move calculation outside or memoize it to prevent logic execution on every render
-const getStatusColor = (expiryDate: string) => {
-  if (!expiryDate) return '#6B7280';
-  const days = Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-  if (days <= 7) return '#EF4444'; 
-  if (days <= 30) return '#F59E0B';
-  return '#10B981';
-};
-
 const InventoryItem = memo(({ item, product, isEditMode, isSelected, onPress, onLongPress }: Props) => {
+  // Grab user preference for warning days from the store
+  const daysBeforeExpiry = useInventoryStore((state) => state.preferences.daysBeforeExpiry);
+  
+  // Calculate dynamic status and discount
+  const status = getCommercialStatus(item.expiryDate, daysBeforeExpiry);
+  
+
   return (
     <TouchableOpacity 
       activeOpacity={0.8}
@@ -38,26 +38,40 @@ const InventoryItem = memo(({ item, product, isEditMode, isSelected, onPress, on
           style={{ marginRight: 12 }} 
         />
       )}
+      
       <Image 
         source={{ uri: product?.imageUrl || 'https://via.placeholder.com/100' }} 
         style={styles.thumb} 
       />
+
       <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={styles.brandTag}>{product?.brand || "Generic"}</Text>
+        <View style={styles.topRow}>
+          <Text style={styles.brandTag}>{product?.brand || "Generic"}</Text>
+          
+          {/* DISCOUNT BADGE - Only shows if warning/critical */}
+          {/* {status.discount > 0 && (
+            <View style={[styles.discountBadge, { backgroundColor: status.color }]}>
+              <Text style={styles.discountText}>{status.discount}% OFF</Text>
+            </View>
+          )} */}
+        <StatusBadge status={status} />
+        </View>
+
         <Text style={styles.productName} numberOfLines={1}>{product?.name}</Text>
         <Text style={styles.barecode} numberOfLines={1}>{product?.barcode}</Text>
-        <View style={styles.expiryRow}>
-           <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.expiryDate) }]} />
-           <Text style={styles.expiryLabel}>{item.expiryDate}</Text>
-        </View>
+        
+           <View style={styles.expiryRow}>
+        <View style={[styles.statusDot, { backgroundColor: status.color }]} />
+        <Text style={styles.expiryLabel}>{item.expiryDate}</Text>
       </View>
+      </View>
+
       <View style={styles.qtyContainer}>
         <Text style={styles.qtyText}>x{item.quantity}</Text>
       </View>
     </TouchableOpacity>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison: Only re-render if these specific things change
   return (
     prevProps.isSelected === nextProps.isSelected &&
     prevProps.isEditMode === nextProps.isEditMode &&
@@ -73,7 +87,10 @@ const styles = StyleSheet.create({
   card: { backgroundColor: 'white', padding: 12, borderRadius: 18, marginBottom: 12, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#F3F4F6' },
   selectedCard: { backgroundColor: '#EFF6FF', borderColor: '#3B82F6' },
   thumb: { width: 50, height: 50, borderRadius: 10, backgroundColor: '#F9FAFB' },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   brandTag: { fontSize: 9, fontWeight: '800', color: '#3B82F6', textTransform: 'uppercase' },
+  discountBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  discountText: { color: 'white', fontSize: 10, fontWeight: '900' },
   productName: { fontSize: 16, fontWeight: '700', color: '#111827' },
   barecode: { fontSize: 12, fontWeight: '700', color: '#2a3c62' },
   expiryRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
